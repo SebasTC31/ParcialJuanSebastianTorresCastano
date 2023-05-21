@@ -16,7 +16,7 @@ namespace ConcertWebApi.DAL
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Ticket>().HasIndex(s => s.EntranceGate).IsUnique();
+            modelBuilder.Entity<Ticket>().HasIndex(t => t.EntranceGate).IsUnique();
         }
     }
 }
