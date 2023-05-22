@@ -1,6 +1,7 @@
 ﻿using ConcertWebApi.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Net.Sockets;
 using WebPages.Models;
 
 namespace WebPages.Controllers
@@ -32,12 +33,12 @@ namespace WebPages.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Validate(Guid? Id)
+        public async Task<IActionResult> Validate(Ticket ticket)
         {
             try
             {
                 var url = "https://localhost:7225/api/Tickets";
-                await _httpClient.CreateClient().PostAsJsonAsync(url, Id);
+                await _httpClient.CreateClient().PostAsJsonAsync(url, ticket);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -90,13 +91,5 @@ namespace WebPages.Controllers
             }
 
         }
-
-        //private async Task<Ticket> GetTicketById(Guid? id)
-        //{
-        //    var url = String.Format("https://localhost:7225/api/Tickets/Get/{0}", id);
-        //    var json = await _httpClient.CreateClient().GetStringAsync(url);
-        //    Ticket tickets = JsonConvert.DeserializeObject<Ticket>(json);
-        //    return tickets;
-        //}
     }
 }
