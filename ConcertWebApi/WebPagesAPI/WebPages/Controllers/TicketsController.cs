@@ -1,6 +1,7 @@
 ﻿using ConcertWebApi.DAL.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using WebPages.Models;
 
 namespace WebPages.Controllers
 {
@@ -51,11 +52,19 @@ namespace WebPages.Controllers
         {
             try
             {
-                return View(await GetTicketById(id));
+                var url = String.Format("https://localhost:7225/api/Tickets/Get/{0}", id);
+                var json = await _httpClient.CreateClient().GetStringAsync(url);
+                Ticket ticket = JsonConvert.DeserializeObject<Ticket>(json);
+                return View(ticket);
             }
             catch (Exception ex)
             {
-                return View("Error", ex);
+                var errorModel = new ErrorViewModel
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+                return View("Error", errorModel);
             }
         }
 
@@ -72,15 +81,22 @@ namespace WebPages.Controllers
             }
             catch (Exception ex)
             {
-                return View("Error", ex);
+                var errorModel = new ErrorViewModel
+                {
+                    Message = ex.Message,
+                    StackTrace = ex.StackTrace
+                };
+                return View("Error", errorModel);
             }
 
         }
 
-        private async Task<Ticket> GetTicketById(Guid? id)
-        {
-            var url = String.Format("https://localhost:7225/api/Tickets/Get/{0}", id);
-            return JsonConvert.DeserializeObject<Ticket>(await _httpClient.CreateClient().GetStringAsync(url));
-        }
+        //private async Task<Ticket> GetTicketById(Guid? id)
+        //{
+        //    var url = String.Format("https://localhost:7225/api/Tickets/Get/{0}", id);
+        //    var json = await _httpClient.CreateClient().GetStringAsync(url);
+        //    Ticket tickets = JsonConvert.DeserializeObject<Ticket>(json);
+        //    return tickets;
+        //}
     }
 }
