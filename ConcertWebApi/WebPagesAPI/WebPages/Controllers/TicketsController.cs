@@ -22,5 +22,27 @@ namespace WebPages.Controllers
             List<Ticket> tickets = JsonConvert.DeserializeObject<List<Ticket>>(json);
             return View(tickets);
         }
+
+        [HttpGet]
+        public IActionResult Validate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Validate(Guid? Id)
+        {
+            try
+            {
+                var url = "https://localhost:7225/api/Tickets";
+                await _httpClient.CreateClient().PostAsJsonAsync(url, Id);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
+        }
     }
 }
