@@ -44,5 +44,43 @@ namespace WebPages.Controllers
                 return View("Error", ex);
             }
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> Validate2(Guid? id)
+        {
+            try
+            {
+                return View(await GetTicketById(id));
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
+        }
+
+        //edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Validate2(Guid? id, Ticket ticket)
+        {
+            try
+            {
+                var url = String.Format("https://localhost:7225/api/Tickets/Put/{0}", id);
+                await _httpClient.CreateClient().PutAsJsonAsync(url, ticket);
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                return View("Error", ex);
+            }
+
+        }
+
+        private async Task<Ticket> GetTicketById(Guid? id)
+        {
+            var url = String.Format("https://localhost:7225/api/Tickets/Get/{0}", id);
+            return JsonConvert.DeserializeObject<Ticket>(await _httpClient.CreateClient().GetStringAsync(url));
+        }
     }
 }

@@ -23,7 +23,8 @@ namespace ConcertWebApi.Controllers
         [Route("Get")]
         public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets()
         {
-            var tickets = await _context.Tickets.ToListAsync();
+            //var tickets = await _context.Tickets.ToListAsync();
+            var tickets = await _context.Tickets.Take(500).ToListAsync();
 
             if (tickets == null) return NotFound();
 
@@ -63,6 +64,49 @@ namespace ConcertWebApi.Controllers
                 await _context.SaveChangesAsync();
                 return Ok("Boleta válida, puede ingresar al concierto");
             }
+        }
+
+        [HttpPut, ActionName("Put")]
+        [Route("Put/{id}")]
+        public async Task<IActionResult> ValidateTicket2(Guid? id, Ticket ticket)
+        {
+            try
+            {
+                var existsTicket = await _context.Tickets.FindAsync(id);
+                if (existsTicket != null)
+                {
+                    if (existsTicket.IsUsed == false && ticket.EntranceGate != "")
+                    {
+                        existsTicket.EntranceGate = ticket.EntranceGate;
+                        existsTicket.UseDate = DateTime.Now;
+                        existsTicket.IsUsed = true;
+                        ticket = existsTicket;
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        if (ticket.EntranceGate == "")
+                        {
+                            return NotFound("Puerta de entrada no puede estar vacío");
+                        }
+                        else
+                        {
+                            return NotFound("Boleta ya usada");
+                        }
+                    }
+
+                }
+                else
+                {
+                    return NotFound("Boleta no válida");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return Conflict(ex.Message);
+            }
+            return Ok("Boleta válida, puede ingresar al concierto");
         }
     }
 }
